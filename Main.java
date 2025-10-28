@@ -40,10 +40,10 @@ public class Main {
                 }
             }
         }
-        int boardSize;
+        int boardSize=1;
         if (isReady){
             // играем
-            monster.difficultGame= 0;
+            monster.difficultGame= 0;// должно быть 0!!!
             System.out.println("Выбери уровень сложности от 1 до 3");
             while (monster.difficultGame < 1 || monster.difficultGame > 3) {
                 monster.difficultGame = sc.nextInt();
@@ -87,17 +87,18 @@ public class Main {
         }else {
             return;
         }
-        castle.image = "\uD83C\uDFF0";
-        person.image = "\uD83E\uDD77"; //🥷
-        monster.demon = "\uD83D\uDE08"; //😈
-        monster.zombi = "\uD83E\uDDDF\u200D"; //🧟‍
-        monster.troll = "\uD83E\uDDCC"; //🧌
-        String space = "  ";
-        castle.x = 0;
-        castle.y = 0;
-        person.x = 0;
-        person.y = boardSize - 1;
-        String[][] board = new String[boardSize][boardSize];
+            castle.image = "\uD83C\uDFF0";
+            person.image = "\uD83E\uDD77"; //🥷
+            monster.demon = "\uD83D\uDE08"; //😈
+            monster.zombi = "\uD83E\uDDDF\u200D"; //🧟‍
+            monster.troll = "\uD83E\uDDCC"; //🧌
+            String space = "  ";
+            castle.x = 0;
+            castle.y = 0;
+            person.x = 0;
+            person.y = boardSize - 1;
+
+            String[][] board = new String[boardSize][boardSize];
         //заполнение поля пробелами
         for (int i = 0; i < boardSize; i++) {
             for (int j = 0; j < boardSize; j++) {
@@ -105,7 +106,7 @@ public class Main {
             }
         }
 
-        // генерация сетки
+            // генерация сетки
         for (int i = 0; i < boardSize; i++) {
             for (int j = 0; j < monster.maxDemon; j++) {
                 int x = rand.nextInt(boardSize-1);
@@ -118,99 +119,99 @@ public class Main {
                 board[i][x]=monster.zombi;
             }
         }
-        castle.x = rand.nextInt(boardSize - 1);
-        person.x = rand.nextInt(boardSize - 1);
-        board[castle.y][castle.x] = castle.image;
-        board[person.y][person.x] = person.image;
+            castle.x = rand.nextInt(boardSize - 1);
+            person.x = rand.nextInt(boardSize - 1);
+            board[castle.y][castle.x] = castle.image;
+            board[person.y][person.x] = person.image;
 
-        // основной блок 'игры'
-        while (person.HP > 0 && (person.x != castle.x || person.y != castle.y)) {
-            for (int y = 0; y < boardSize; y++) {
+            // основной блок 'игры'
+            while (person.HP > 0 && (person.x != castle.x || person.y != castle.y)) {
+                for (int y = 0; y < boardSize; y++) {
+                    System.out.print(" +");
+                    for (int i = 0; i < boardSize; i++) {
+                        System.out.print(" —— +");
+                    }
+                    System.out.println();
+                    System.out.print(" | ");
+                    // выводит перемычку
+                    // цикл выводит основную часть сетки
+                    for (int x = 0; x < boardSize; x++) {
+                        System.out.print(board[y][x] + " | ");
+                        if (x + 1 == boardSize)
+                            System.out.print("\n");
+                    }
+
+                }
                 System.out.print(" +");
                 for (int i = 0; i < boardSize; i++) {
                     System.out.print(" —— +");
                 }
                 System.out.println();
+                System.out.println("Введи координаты передвижения(ряд и столбец):  ");
+                int y = sc.nextInt();
+                int x = sc.nextInt();
+                while(!isMoveCorrect(y-1,x-1,person.y, person.x)){
+                    board[person.y][person.x] = space;
+                    board[y-1][x-1] = person.image;
+                    person.y = y-1;
+                    person.x = x-1;
+                    if(!(isMoveCorrect(y-1,x-1,person.y, person.x))){
+                        System.out.println("Некорректные координаты! Введите повторно!");
+                        y = sc.nextInt();
+                        x = sc.nextInt();
+                    }
+                }
+                board[person.y][person.x]=space;
+                person.x=x-1;
+                person.y=y-1;
+
+                //ход
+
+                if (board[person.y][person.x] == monster.zombi){
+                    while (!monster.taskZombi() && person.HP > 0){
+                        person.HP--;
+                        System.out.println("У тебя " + person.HP + " сердца(-ец)");
+                    }
+                }else if (board[person.y][person.x] == monster.troll){
+                    while(!monster.taskTroll() && person.HP > 0){
+                        person.HP-=2;
+                        System.out.println("У тебя " + person.HP + " сердца(-ец)");
+                    }
+                }else if (board[person.y][person.x] == monster.demon){
+                    person.HP=0;
+                    System.out.println("Тебя съел демон");
+                    System.out.println("У тебя " + person.HP + " сердца(-ец)");
+                }
+                if (person.HP > 0){
+                    board[person.y][person.x]=person.image;
+                }
+            }if (castle.x==person.x && castle.y == person.y)
+                board[castle.y][castle.x]= castle.image;
+            for (int y = 0; y < boardSize; y++) {
+                System.out.print(" +");
+                for (int i = 0; i < boardSize; i++) {
+                    System.out.print(" —— +");
+                }// выводит перемычку
+                System.out.println();
                 System.out.print(" | ");
-                // выводит перемычку
+
                 // цикл выводит основную часть сетки
                 for (int x = 0; x < boardSize; x++) {
                     System.out.print(board[y][x] + " | ");
                     if (x + 1 == boardSize)
                         System.out.print("\n");
                 }
-
             }
             System.out.print(" +");
             for (int i = 0; i < boardSize; i++) {
                 System.out.print(" —— +");
             }
             System.out.println();
-            System.out.println("Введи координаты передвижения(ряд и столбец):  ");
-            int y = sc.nextInt();
-            int x = sc.nextInt();
-            while(!isMoveCorrect(y-1,x-1,person.y, person.x)){
-                board[person.y][person.x] = space;
-                board[y-1][x-1] = person.image;
-                person.y = y-1;
-                person.x = x-1;
-                if(!(isMoveCorrect(y-1,x-1,person.y, person.x))){
-                    System.out.println("Некорректные координаты! Введите повторно!");
-                    y = sc.nextInt();
-                    x = sc.nextInt();
-                }
+            if (person.HP <= 0){
+                System.out.println("Твой персонаж умер, ты проиграл :(");
+            }else{
+                System.out.println("Ты победил!");
             }
-            board[person.y][person.x]=space;
-            person.x=x-1;
-            person.y=y-1;
-
-            //ход
-
-            if (board[person.y][person.x] == monster.zombi){
-                while (!monster.taskZombi() && person.HP > 0){
-                    person.HP--;
-                    System.out.println("У тебя " + person.HP + " сердца(-ец)");
-                }
-            }else if (board[person.y][person.x] == monster.troll){
-                while(!monster.taskTroll() && person.HP > 0){
-                    person.HP-=2;
-                    System.out.println("У тебя " + person.HP + " сердца(-ец)");
-                }
-            }else if (board[person.y][person.x] == monster.demon){
-                person.HP=0;
-                System.out.println("Тебя съел демон");
-                System.out.println("У тебя " + person.HP + " сердца(-ец)");
-            }
-            if (person.HP > 0){
-                board[person.y][person.x]=person.image;
-            }
-        }if (castle.x==person.x && castle.y == person.y)
-            board[castle.y][castle.x]= castle.image;
-        for (int y = 0; y < boardSize; y++) {
-            System.out.print(" +");
-            for (int i = 0; i < boardSize; i++) {
-                System.out.print(" —— +");
-            }// выводит перемычку
-            System.out.println();
-            System.out.print(" | ");
-
-            // цикл выводит основную часть сетки
-            for (int x = 0; x < boardSize; x++) {
-                System.out.print(board[y][x] + " | ");
-                if (x + 1 == boardSize)
-                    System.out.print("\n");
-            }
-        }
-        System.out.print(" +");
-        for (int i = 0; i < boardSize; i++) {
-            System.out.print(" —— +");
-        }
-        System.out.println();
-        if (person.HP <= 0){
-            System.out.println("Твой персонаж умер, ты проиграл :(");
-        }else{
-            System.out.println("Ты победил!");
-        }
 
 
     }
